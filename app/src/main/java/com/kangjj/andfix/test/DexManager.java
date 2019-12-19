@@ -31,13 +31,16 @@ public class DexManager {
     public void loadDex(File file){
         try {
             if(file!=null && file.exists()){
+                //TODO 1、加载修改完bug的文件 DexFile.loadDex
                 DexFile dexFile = DexFile.loadDex(file.getAbsolutePath(),
                         new File(mContext.getCacheDir(),"opt").getAbsolutePath(),
                         Context.MODE_PRIVATE);
                 Enumeration<String> entries = dexFile.entries();
+                //todo 2、遍历Dex中的所有类
                 while (entries.hasMoreElements()) {
                     String className = entries.nextElement();
 //                Class.forName(className);这种方式只能获取安装app中的class
+                    //todo 3、加载类 dexFile.loadClass
                     Class fixClazz = dexFile.loadClass(className, mContext.getClassLoader());
                     if(fixClazz!=null){
                         fixClass(fixClazz);
@@ -60,6 +63,7 @@ public class DexManager {
         Class<?> bugClass;
         Method bugMethod;
         for (Method fixMethod : methods) {
+            //todo 4、遍历所有的方法 通过注解的方式找到需要修改的类名以及方法名
             methodReplace = fixMethod.getAnnotation(MethodReplace.class);
             if(methodReplace == null){
                 continue;
@@ -71,6 +75,7 @@ public class DexManager {
                 try {
                     bugClass = Class.forName(className);
                     bugMethod = bugClass.getDeclaredMethod(methodName,fixMethod.getParameterTypes());
+                    //todo 5、jni调用替换方法
                     replace(bugMethod,fixMethod);
                     Log.e(TAG, "修复完成！");
                 } catch (Exception e) {

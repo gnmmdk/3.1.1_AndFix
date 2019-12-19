@@ -2,16 +2,15 @@
 #include <string>
 #include <android/log.h>
 #include "art_5_1.h"
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_kangjj_andfix_test_DexManager_replace(JNIEnv *env, jobject instance, jobject bugMethod,
                                                jobject fixMethod) {
-    //获得指向被替换方法的指针
+    //todo 5.1、获得指向被替换方法的指针
     art::mirror::ArtMethod *bugArtMethod = reinterpret_cast<art::mirror::ArtMethod *>(env->FromReflectedMethod(bugMethod));
-    //获得指向修改完bug后的方法指针
+    //todo 5.1、获得指向修改完bug后的方法指针
     art::mirror::ArtMethod *fixedArtMethod = reinterpret_cast<art::mirror::ArtMethod *>(env->FromReflectedMethod(fixMethod));
-
+    //todo 5.2、将bug方法的环境赋给修复好的方法 ？ 自己的理解
     reinterpret_cast<art::mirror::Class *>(fixedArtMethod->declaring_class_)->class_loader_=
             reinterpret_cast<art::mirror::Class *>(bugArtMethod->declaring_class_)->class_loader_;
     reinterpret_cast<art::mirror::Class *>(fixedArtMethod->declaring_class_)->clinit_thread_id_ =
@@ -20,7 +19,7 @@ Java_com_kangjj_andfix_test_DexManager_replace(JNIEnv *env, jobject instance, jo
             reinterpret_cast<art::mirror::Class *>(bugArtMethod->declaring_class_)->status_-1;
     reinterpret_cast<art::mirror::Class *>(fixedArtMethod->declaring_class_)->super_class_ = 0 ;
 
-    //把函数的成员变量替换成新函数
+    //todo 5.3、把函数的成员变量替换成新函数
     bugArtMethod->declaring_class_=fixedArtMethod->declaring_class_;
     bugArtMethod->dex_cache_resolved_methods_ = fixedArtMethod->dex_cache_resolved_methods_;
     bugArtMethod->dex_cache_resolved_types_ = fixedArtMethod->dex_cache_resolved_types_;

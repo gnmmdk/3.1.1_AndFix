@@ -14,6 +14,15 @@ import android.widget.TextView;
 
 import java.io.File;
 
+/**
+ *  每一个Java方法在Art虚拟机中都对应一个ArtMethod，ArtMethod记录了该方法的所有信息，包括所属类、访问权限、代码执行地址等。
+*  通过env->FromReflectedMethod,可以由Method对象得到这个方法对应的ArtMethod的真正起始地址，然后强转为ArtMethod指针，
+*   通过指针的操作对其成员属性进行修改替换。
+*  原理总结：  当我们把旧方法（ArtMethod）的所有成员字段都替换为新的方法（ArtMethod）的成员字段后，
+*   执行时所有的数据就可以保持和新方法的数据一致。这样在所有执行旧方法的地方，会获取新方法的执行入口、
+*   索引类型、方法索引号、以及所属dex信息，然后向调用旧方法一样，执行新方法的逻辑。
+ *   兼容性问题的结局方案：https://blog.csdn.net/gnmmdk/article/details/97959108
+ */
 public class MainActivity extends AppCompatActivity {
 
     //请求状态码
